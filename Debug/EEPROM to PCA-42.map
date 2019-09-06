@@ -371,14 +371,14 @@ END GROUP
                 0x00000224       0xb2 main.o
                 0x00000224                initialize
  .text.read_external_eeprom
-                0x000002d6       0xde main.o
+                0x000002d6       0xd6 main.o
                 0x000002d6                read_external_eeprom
  .text.write_external_eeprom
-                0x000003b4       0x96 main.o
-                0x000003b4                write_external_eeprom
+                0x000003ac       0x9c main.o
+                0x000003ac                write_external_eeprom
  .text.startup.main
-                0x0000044a       0x4e main.o
-                0x0000044a                main
+                0x00000448       0x50 main.o
+                0x00000448                main
  .text.__vector_13
                 0x00000498       0x4c main.o
                 0x00000498                __vector_13
@@ -546,11 +546,11 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x3c9a
+.debug_info     0x00000000     0x3ca0
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000     0x284f C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/XMEGAA_DFP/1.1.68/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
- .debug_info    0x0000284f      0xb10 main.o
- .debug_info    0x0000335f      0x93b twi_master_driver.o
+ .debug_info    0x0000284f      0xb16 main.o
+ .debug_info    0x00003365      0x93b twi_master_driver.o
 
 .debug_abbrev   0x00000000     0x2bf7
  *(.debug_abbrev)
@@ -558,16 +558,16 @@ END GROUP
  .debug_abbrev  0x0000262c      0x29c main.o
  .debug_abbrev  0x000028c8      0x32f twi_master_driver.o
 
-.debug_line     0x00000000      0xb29
+.debug_line     0x00000000      0xb33
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x391 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/XMEGAA_DFP/1.1.68/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
- .debug_line    0x00000391      0x3e9 main.o
- .debug_line    0x0000077a      0x3af twi_master_driver.o
+ .debug_line    0x00000391      0x3f3 main.o
+ .debug_line    0x00000784      0x3af twi_master_driver.o
 
-.debug_frame    0x00000000      0x280
+.debug_frame    0x00000000      0x288
  *(.debug_frame)
- .debug_frame   0x00000000      0x190 main.o
- .debug_frame   0x00000190       0xf0 twi_master_driver.o
+ .debug_frame   0x00000000      0x198 main.o
+ .debug_frame   0x00000198       0xf0 twi_master_driver.o
 
 .debug_str      0x00000000     0x24dd
  *(.debug_str)
@@ -577,10 +577,10 @@ END GROUP
  .debug_str     0x000021d7      0x306 twi_master_driver.o
                                 0x64f (size before relaxing)
 
-.debug_loc      0x00000000      0xd0f
+.debug_loc      0x00000000      0xd63
  *(.debug_loc)
- .debug_loc     0x00000000      0x754 main.o
- .debug_loc     0x00000754      0x5bb twi_master_driver.o
+ .debug_loc     0x00000000      0x7a8 main.o
+ .debug_loc     0x000007a8      0x5bb twi_master_driver.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -607,5 +607,5 @@ END GROUP
 
 .debug_macro
  *(.debug_macro)
-OUTPUT(PCA-42.elf elf32-avr)
+OUTPUT(EEPROM to PCA-42.elf elf32-avr)
 LOAD linker stubs

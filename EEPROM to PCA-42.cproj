@@ -13,7 +13,7 @@
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <AssemblyName>PCA-42</AssemblyName>
-    <Name>PCA-42</Name>
+    <Name>EEPROM to PCA-42</Name>
     <RootNamespace>PCA-42</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
@@ -68,6 +68,16 @@
       </ToolNumber>
       <ToolName xmlns="">Simulator</ToolName>
     </com_atmel_avrdbg_tool_simulator>
+    <com_atmel_avrdbg_tool_ispmk2>
+      <ToolOptions>
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>PDI</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
+      <ToolNumber>680234278896</ToolNumber>
+      <ToolName>AVRISP mkII</ToolName>
+    </com_atmel_avrdbg_tool_ispmk2>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -151,18 +161,6 @@
     <Compile Include="avr_compiler.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="ft800_functions.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ft800_functions.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ina226.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ina226.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
@@ -170,18 +168,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="pca42.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="program_functions.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="program_functions.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="setting_current_functions.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="setting_current_functions.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="twi_master_driver.c">

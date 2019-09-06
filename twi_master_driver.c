@@ -66,7 +66,6 @@
 *****************************************************************************/
 
 #include "twi_master_driver.h"
-#include "main.h"
 
 /*! \brief Initialize the TWI module.
 *
@@ -91,7 +90,6 @@ uint8_t baudRateRegisterSetting)
 	TWI_MASTER_ENABLE_bm;
 	twi->interface->MASTER.BAUD = baudRateRegisterSetting;
 	twi->interface->MASTER.STATUS = TWI_MASTER_BUSSTATE_IDLE_gc;
-	counters.i2c_error_counter = 0;
 }
 
 
@@ -148,16 +146,6 @@ bool TWI_MasterReady(TWI_Master_t *twi)
 bool TWI_MasterWrite(TWI_Master_t *twi, uint8_t address, uint8_t *writeData, uint8_t bytesToWrite)
 {
 	bool twi_status = TWI_MasterWriteRead(twi, address, writeData, bytesToWrite, 0);
-	
-	_delay_ms(10);
-	if (!twi_status)
-	{
-		counters.i2c_error_counter++;
-	}
-	else
-	{
-		counters.i2c_error_counter = 0;
-	}
 	return twi_status;
 }
 
@@ -176,14 +164,6 @@ bool TWI_MasterWrite(TWI_Master_t *twi, uint8_t address, uint8_t *writeData, uin
 bool TWI_MasterRead(TWI_Master_t *twi, uint8_t address, uint8_t bytesToRead)
 {
 	bool twi_status = TWI_MasterWriteRead(twi, address, 0, 0, bytesToRead);
-	if (!twi_status)
-	{
-		counters.i2c_error_counter++;
-	}
-	else
-	{
-		counters.i2c_error_counter = 0;
-	}
 	return twi_status;
 }
 
@@ -208,12 +188,10 @@ bool TWI_MasterWriteRead(TWI_Master_t *twi, uint8_t address, uint8_t *writeData,
 	/*Parameter sanity check. */
 	if (bytesToWrite > TWIM_WRITE_BUFFER_SIZE)
 	{
-		counters.i2c_error_counter++;
 		return false;
 	}
 	if (bytesToRead > TWIM_READ_BUFFER_SIZE)
 	{
-		counters.i2c_error_counter++;
 		return false;
 	}
 
@@ -255,13 +233,10 @@ bool TWI_MasterWriteRead(TWI_Master_t *twi, uint8_t address, uint8_t *writeData,
 			twi->interface->MASTER.ADDR = readAddress;
 		}
 		
-		counters.i2c_error_counter = 0;
-		
 		return true;
 	}
 	else
 	{
-		counters.i2c_error_counter++;
 		return false;
 	}
 }
@@ -343,82 +318,6 @@ void TWI_MasterWriteHandler(TWI_Master_t *twi)
 	/* Local variables used in if tests to avoid compiler warning. */
 	uint8_t bytesToWrite  = twi->bytesToWrite;
 	uint8_t bytesToRead   = twi->bytesToRead;
-
-	if (twi->interface->MASTER.STATUS & TWI_MASTER_RXACK_bm)
-	{
-		switch (twi->address >> 1)
-		{
-			case OUTPUT1_INA226_ADDR:
-			{
-				program_state.comm_error1 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR1_AMT_ADDR);
-				program_state.comm_error1++;
-				program_state.comm_error1_to_display = TRUE;
-
-				break;
-			}
-			
-			case OUTPUT2_INA226_ADDR:
-			{
-				program_state.comm_error2 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR2_AMT_ADDR);
-				program_state.comm_error2++;
-				program_state.comm_error2_to_display = TRUE;
-
-				break;
-			}
-			
-			case OUTPUT1_DAC101C085_ADDR:
-			{
-				program_state.comm_error3 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR3_AMT_ADDR);
-				program_state.comm_error3++;
-				program_state.comm_error3_to_display = TRUE;
-
-				break;
-			}
-
-			case OUTPUT2_DAC101C085_ADDR:
-			{
-				program_state.comm_error4 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR4_AMT_ADDR);
-				program_state.comm_error4++;
-				program_state.comm_error4_to_display = TRUE;
-
-				break;
-			}
-
-			case BOARD_41EC_ADDR:
-			{
-				program_state.comm_error5 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR5_AMT_ADDR);
-				program_state.comm_error5++;
-				program_state.comm_error5_to_display = TRUE;
-
-				break;
-			}
-		}
-	}
-	else
-	{
-		switch (twi->address >> 1)
-		{
-			case OUTPUT1_INA226_ADDR:
-			program_state.comm_error1_to_display = FALSE;
-			break;
-			
-			case OUTPUT2_INA226_ADDR:
-			program_state.comm_error2_to_display = FALSE;
-			break;
-			
-			case OUTPUT1_DAC101C085_ADDR:
-			program_state.comm_error3_to_display = FALSE;
-			break;
-			
-			case OUTPUT2_DAC101C085_ADDR:
-			program_state.comm_error4_to_display = FALSE;
-			break;
-			
-			case BOARD_41EC_ADDR:
-			program_state.comm_error5_to_display = FALSE;
-			break;
-		}
-	}
 
 	/* If NOT acknowledged (NACK) by slave cancel the transaction. */
 	if (twi->interface->MASTER.STATUS & TWI_MASTER_RXACK_bm) 
@@ -508,80 +407,4 @@ void TWI_MasterTransactionFinished(TWI_Master_t *twi, uint8_t result)
 {
 	twi->result = result;
 	twi->status = TWIM_STATUS_READY;
-	
-	if (result == TWIM_RESULT_BUFFER_OVERFLOW || result == TWIM_RESULT_ARBITRATION_LOST || result == TWIM_RESULT_BUS_ERROR || result == TWIM_RESULT_FAIL)
-	{
-		switch (twi->address >> 1)
-		{
-			case OUTPUT1_INA226_ADDR:
-			{
-				program_state.comm_error1 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR1_AMT_ADDR);
-				program_state.comm_error1++;
-				program_state.comm_error1_to_display = TRUE;
-
-				break;
-			}
-			
-			case OUTPUT2_INA226_ADDR:
-			{
-				program_state.comm_error2 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR2_AMT_ADDR);
-				program_state.comm_error2++;
-				program_state.comm_error2_to_display = TRUE;
-
-				break;
-			}
-			
-			case OUTPUT1_DAC101C085_ADDR:
-			{
-				program_state.comm_error3 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR3_AMT_ADDR);
-				program_state.comm_error3++;
-				program_state.comm_error3_to_display = TRUE;
-
-				break;
-			}
-
-			case OUTPUT2_DAC101C085_ADDR:
-			{
-				program_state.comm_error4 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR4_AMT_ADDR);
-				program_state.comm_error4++;
-				program_state.comm_error4_to_display = TRUE;
-
-				break;
-			}
-
-			case BOARD_41EC_ADDR:
-			{
-				program_state.comm_error5 = read_external_eeprom(&twiMasterForEEPROM, EXTERNAL_EEPROM_ADDR, EEPROM_COM_ERROR5_AMT_ADDR);
-				program_state.comm_error5++;
-				program_state.comm_error5_to_display = TRUE;
-
-				break;
-			}
-		}
-	}
-	else
-	{
-		switch (twi->address >> 1)
-		{
-			case OUTPUT1_INA226_ADDR:
-			program_state.comm_error1_to_display = FALSE;
-			break;
-			
-			case OUTPUT2_INA226_ADDR:
-			program_state.comm_error2_to_display = FALSE;
-			break;
-			
-			case OUTPUT1_DAC101C085_ADDR:
-			program_state.comm_error3_to_display = FALSE;
-			break;
-			
-			case OUTPUT2_DAC101C085_ADDR:
-			program_state.comm_error4_to_display = FALSE;
-			break;
-			
-			case BOARD_41EC_ADDR:
-			program_state.comm_error5_to_display = FALSE;
-			break;
-		}
-	}
 }
